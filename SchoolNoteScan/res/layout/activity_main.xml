@@ -1,0 +1,75 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    tools:context=".MainActivity" >
+
+    <RelativeLayout
+        android:id="@+id/mainRelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/title"
+        android:padding="8dp" >
+
+        <ImageButton
+            android:id="@+id/btnMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:src="@drawable/menu_button_on" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layoutContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/mainRelativeLayout1"
+        android:orientation="vertical" >
+
+        <fragment
+            android:id="@+id/fragDocument"
+            android:name="com.hien.schoolnotescan.DocumentFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/fragTutor"
+            android:name="com.hien.schoolnotescan.TutorialFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/fragWifi"
+            android:name="com.hien.schoolnotescan.WifiSharingFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/fragAbout"
+            android:name="com.hien.schoolnotescan.AboutFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/fragHelp"
+            android:name="com.hien.schoolnotescan.HelpFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/fragRestore"
+            android:name="com.hien.schoolnotescan.RestorePurchaseFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <fragment
+            android:id="@+id/fragUnlock"
+            android:name="com.hien.schoolnotescan.UnlockPremiumFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

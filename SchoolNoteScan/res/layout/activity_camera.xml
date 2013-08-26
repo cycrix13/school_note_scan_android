@@ -1,0 +1,60 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".CameraActivity" >
+    
+    <com.hien.schoolnotescan.CoreCanvas
+        android:id="@+id/canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true" >
+
+        <Button
+            android:id="@+id/btnRetake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retake" />
+
+        <Button
+            android:id="@+id/btnFinished"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:text="Finished" />
+    </RelativeLayout>
+
+    <ProgressBar
+        android:id="@+id/prgWaiting"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btnUndo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout1"
+        android:layout_alignParentRight="true"
+        android:text="Undo" />
+
+    <Button
+        android:id="@+id/btnAddbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnUndo"
+        android:layout_alignBottom="@+id/btnUndo"
+        android:layout_toLeftOf="@+id/btnUndo"
+        android:text="Add box" />
+
+</RelativeLayout>
