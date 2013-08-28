@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TutorialFragment extends Fragment{
+public class TutorialFragment extends RootFragment{
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method

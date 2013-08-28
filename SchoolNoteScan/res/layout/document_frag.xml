@@ -1,21 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dslv="http://schemas.android.com/apk/res/com.hien.schoolnotescan"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:background="#FFFFFF" >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+    <com.mobeta.android.dslv.DragSortListView
+        android:id="@+id/lstDoc"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="3dp"
+        android:divider="@drawable/doc_list_divider"
+        android:dividerHeight="1px"
+        android:padding="3dp"
+        dslv:remove_enabled="true"
+        dslv:drag_enabled="true"
+        dslv:remove_mode="clickRemove"
+        dslv:drag_handle_id="@+id/imgReorder"
+        dslv:click_remove_id="@+id/imgDelete"
+        dslv:float_background_color="#FFFFFF"
+	    dslv:collapsed_height="2dp"
+	    dslv:drag_scroll_start="0.33"
+	    dslv:max_drag_scroll_speed="0.5"
+	    dslv:slide_shuffle_speed="0.3"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="Document fragment"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+    <ImageButton
+        android:id="@+id/btnCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="10dp"
+        android:background="#00000000"
+        android:src="@drawable/camera_button_style" />
 
-    </RelativeLayout>
-
-</LinearLayout>
+</RelativeLayout>

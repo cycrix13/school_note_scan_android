@@ -2,24 +2,17 @@ package com.hien.schoolnotescan;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.app.Activity;
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -28,20 +21,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
 public class MainActivity extends FragmentActivity {
 	
 	private static final String  TAG = "MainActivity";
-	
-	public static CppCore mCore;
-	
-	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-	public static final int MEDIA_TYPE_IMAGE = 1;
-//	public static final int MEDIA_TYPE_VIDEO = 2;
-	
-	private Uri fileUri;
 	
 	private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
     	@Override
@@ -63,10 +52,12 @@ public class MainActivity extends FragmentActivity {
     	}
     };
     
+	public static CppCore mCore;
+    
     private ExpandableListView 	expListView;
     private SlidingMenu 		mSideMenu;
     
-    private Fragment[] 				mFragmentArr = new Fragment[7];
+    private RootFragment[] 			mFragmentArr = new RootFragment[7];
     private DocumentFragment		mDocFrag;
     private TutorialFragment 		mTutorFrag;
     private WifiSharingFragment 	mWifiFrag;
@@ -74,7 +65,7 @@ public class MainActivity extends FragmentActivity {
     private HelpFragment 			mHelpFrag;
     private RestorePurchaseFragment mRestoreFrag;
     private UnlockPremiumFragment 	mUnlockFrag;
-    private Fragment				mActiveFrag;
+    private RootFragment			mActiveFrag;
     
     ///////////////////////////////////////////////////////////////////////////
     // Override method
@@ -84,6 +75,9 @@ public class MainActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        // Init OpenCV
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
         
         // Start flash screen
         Intent intent = new Intent(this, FlashActivity.class);
@@ -108,6 +102,17 @@ public class MainActivity extends FragmentActivity {
 			public void onClick(View arg0) {
 				
 				mSideMenu.toggle();
+			}
+		});
+		
+		// Set edit button
+		((Button) findViewById(R.id.btnEdit))
+		.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				
+				mActiveFrag.toggleEdit();
 			}
 		});
         
@@ -141,13 +146,6 @@ public class MainActivity extends FragmentActivity {
         // Add document fragment as default
 //        getSupportFragmentManager().beginTransaction().add(R.id.layoutContent, mDocFrag).commit();
     }
-
-    @Override
-    protected void onResume() {
-    
-    	super.onResume();
-    	OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
-    }
     
     @Override
     protected void onDestroy() {
@@ -170,46 +168,81 @@ public class MainActivity extends FragmentActivity {
     	super.onActivityResult(requestCode, resultCode, data);
     	
     	switch (requestCode) {
+    	
     	case FlashActivity.REQUEST_CODE:
     		if (resultCode == FlashActivity.RESULT_CODE_RETAKE) 
     			takePhoto();
     		break;
     		
-    	case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
-    		if (resultCode == RESULT_OK) {
-                // Image captured and saved to fileUri specified in the Intent
-                String path = fileUri.getPath();
-                Intent i = new Intent(this, CameraActivity.class);
-                i.putExtra("path", path);
-                startActivityForResult(i, CameraActivity.REQUEST_CODE);
-            } else if (resultCode == RESULT_CANCELED) {
-                // User cancelled the image capture
-            } else {
-                // Image capture failed, advise user
-            }
-    		break;
-    		
     	case CameraActivity.REQUEST_CODE:
-    		if (resultCode == CameraActivity.RESULT_CODE_RETAKE)
+    		switch (resultCode) {
+    		
+    		case CameraActivity.RESULT_CODE_RETAKE:
     			takePhoto();
+    			break;
+    			
+    		case CameraActivity.RESULT_CODE_NEW_DOC:
+    			// get box list from static field
+    			mDocFrag.addNewDoc(CameraActivity.boxList);
+    			break;
+    			
+    		case CameraActivity.RESULT_CODE_ADD_DOC:
+    			break;
+    		}
     		break;
     	}
-    }
-    
+    }    
+
 	///////////////////////////////////////////////////////////////////////////
 	// Public method
 	///////////////////////////////////////////////////////////////////////////
-    
-    public void takePhoto() {
+
+	public void updateEditButtonState() {
     	
-    	Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE); // create a file to save the image
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file name
-
-        // start the image capture Intent
-        startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+    	Button btnEdit = (Button) findViewById(R.id.btnEdit);
+    	TextView txtTitle = (TextView) findViewById(R.id.txtTitle);
+    	
+    	if (mActiveFrag.canEdit()) {
+    		
+    		// Set visible and appropriate text
+    		btnEdit.setVisibility(View.VISIBLE);
+    		if (mActiveFrag.isEditing()) {
+    			btnEdit.setText("Done");
+    			btnEdit.setBackgroundResource(R.drawable.button_iphone_highlight);
+    		} else {
+    			btnEdit.setText("Edit");
+    			btnEdit.setBackgroundResource(R.drawable.button_iphone_default);
+    		}
+    	} else {
+    		
+    		// Let the button vanish
+    		btnEdit.setVisibility(View.GONE);
+    	}
+    	
+    	// Set title text 
+    	if (mActiveFrag == mDocFrag) {
+    		txtTitle.setText("Documents");
+    	} else if (mActiveFrag == mTutorFrag) {
+    		txtTitle.setText("Tutorial");
+    	} else if (mActiveFrag == mWifiFrag) {
+    		txtTitle.setText("Wifi Sharing");
+    	} else if (mActiveFrag == mAboutFrag) {
+    		txtTitle.setText("About");
+    	} else if (mActiveFrag == mHelpFrag) {
+    		txtTitle.setText("Help");
+    	} else if (mActiveFrag == mRestoreFrag) {
+    		txtTitle.setText("Restore purchase");
+    	} else if (mActiveFrag == mUnlockFrag) {
+    		txtTitle.setText("Unlock Premium");
+    	}
     }
+
+	public void takePhoto() {
+
+		Intent i = new Intent(this, CameraActivity.class);
+		i.putExtra("mode", CameraActivity.RESULT_CODE_NEW_DOC);
+		startActivityForResult(i, CameraActivity.REQUEST_CODE);
+	}
     
 	///////////////////////////////////////////////////////////////////////////
 	// side menu event handler
@@ -221,6 +254,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mDocFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onTutorialClick() {
@@ -229,6 +263,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mTutorFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onWifiSharingClick() {
@@ -237,6 +272,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mWifiFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onAboutClick() {
@@ -245,6 +281,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mAboutFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onHelpClick() {
@@ -253,6 +290,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mHelpFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onRestorePurchaseClick() {
@@ -261,6 +299,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mRestoreFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onUnlockPremium() {
@@ -269,6 +308,7 @@ public class MainActivity extends FragmentActivity {
     	mActiveFrag = mUnlockFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     public void onTagsClick(int index) {
@@ -277,42 +317,8 @@ public class MainActivity extends FragmentActivity {
     }
     
     ///////////////////////////////////////////////////////////////////////////
-    // Minor stuff
+    // Pivate method
     ///////////////////////////////////////////////////////////////////////////
     
-    /** Create a file Uri for saving an image or video */
-    public static Uri getOutputMediaFileUri(int type){
-          return Uri.fromFile(getOutputMediaFile(type));
-    }
-    
-    /** Create a File for saving an image or video */
-    public static File getOutputMediaFile(int type){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
 
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                  Environment.DIRECTORY_PICTURES), "MyCameraApp");
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                Log.d("MyCameraApp", "failed to create directory");
-                return null;
-            }
-        }
-
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == MEDIA_TYPE_IMAGE){
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-            "IMG_"+ timeStamp + ".jpg");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
 }

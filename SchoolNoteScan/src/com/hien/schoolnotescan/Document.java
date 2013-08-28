@@ -8,13 +8,19 @@ import android.graphics.Bitmap;
 
 public class Document {
 	
-	private Bitmap 	mBmDocument ;
-	private String 	mName;
-	private Date 	mDate;
-	private List<Bitmap> mBmNoteArr = new ArrayList<Bitmap>();
+	public Bitmap 		mBmDocument;
+	public String 		mName;
+	public Date 		mDate = new Date();
+	public List<Bitmap> mBmNoteArr = new ArrayList<Bitmap>();
 	
 	public Document() {
 		
 		
+	}
+	
+	@Override
+	public String toString() {
+
+		return mName;
 	}
 }

@@ -22,7 +22,7 @@ public class CoreCanvas extends SurfaceView implements SurfaceHolder.Callback, O
 	private Paint 		mBlackPaint;
 	private boolean 	mCreated;
 	private Point		mParentSize;
-	private LayerManager mLayerManager;
+	public LayerManager mLayerManager;
 
 	private void init() {
 		
@@ -116,9 +116,10 @@ public class CoreCanvas extends SurfaceView implements SurfaceHolder.Callback, O
 		
 		Canvas canvas = new Canvas(mBmBuffer);
 		
-		canvas.drawBitmap(mBg, 
-				new Rect(0, 0, mBg.getWidth(), mBg.getHeight()),
-				new Rect(0, 0, getWidth(), getHeight()), null);
+		if (mBg != null)
+			canvas.drawBitmap(mBg, 
+					new Rect(0, 0, mBg.getWidth(), mBg.getHeight()),
+					new Rect(0, 0, getWidth(), getHeight()), null);
 
 		mLayerManager.draw(canvas, new Point());
 	}

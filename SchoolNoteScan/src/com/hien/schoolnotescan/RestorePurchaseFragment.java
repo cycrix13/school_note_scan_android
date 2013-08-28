@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class RestorePurchaseFragment extends Fragment{
+public class RestorePurchaseFragment extends RootFragment{
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method

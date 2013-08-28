@@ -6,5 +6,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_flash">FlashActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
+    <string name="title_activity_detail_document">DetailDocumentActivity</string>
 
 </resources>

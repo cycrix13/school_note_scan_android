@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class HelpFragment extends Fragment{
+public class HelpFragment extends RootFragment{
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method

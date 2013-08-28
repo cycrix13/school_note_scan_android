@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class WifiSharingFragment extends Fragment{
+public class WifiSharingFragment extends RootFragment{
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method

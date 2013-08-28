@@ -1,6 +1,5 @@
 package com.hien.schoolnotescan;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -119,7 +118,7 @@ public class LayerManager extends CyView {
 	 */
 	public class Stage {
 		
-		private List<BoxState> mBoxStateList = new ArrayList<BoxState>();
+		public List<BoxState> mBoxStateList = new ArrayList<BoxState>();
 		
 		public Stage() {
 			snapshot();
@@ -145,16 +144,16 @@ public class LayerManager extends CyView {
 				mLayerList.add(l);
 			}
 		}
+	}
+	
+	/**
+	 * 
+	 * @author HIEN-PC
+	 * Status of a box
+	 */
+	public static class BoxState {
 		
-		/**
-		 * 
-		 * @author HIEN-PC
-		 * Status of a box
-		 */
-		public class BoxState {
-			
-			public Point pos, size;
-		}
+		public Point pos, size;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
