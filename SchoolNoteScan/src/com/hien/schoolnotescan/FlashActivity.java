@@ -11,9 +11,9 @@ import android.widget.ImageButton;
 
 public class FlashActivity extends Activity {
 	
-	public static final int REQUEST_CODE = 101;
+	public static final int REQUEST_CODE = GlobalVariable.FLASH_ACTIVITY_REQUEST_CODE;
 	
-	public static final int RESULT_CODE_RETAKE = 102;
+	public static final int RESULT_CODE_RETAKE = REQUEST_CODE + 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +31,4 @@ public class FlashActivity extends Activity {
 			}
 		});
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.flash, menu);
-		return true;
-	}
-	
-	
-
 }

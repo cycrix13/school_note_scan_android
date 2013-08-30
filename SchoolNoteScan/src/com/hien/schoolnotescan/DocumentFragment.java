@@ -20,6 +20,8 @@ import android.view.View.OnClickListener;
 import android.view.View.OnDragListener;
 import android.view.ViewGroup;
 import android.webkit.WebView.FindListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
@@ -46,6 +48,7 @@ public class DocumentFragment extends RootFragment {
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 		
 		mLstDoc = (DragSortListView) getView().findViewById(R.id.lstDoc);
 		
@@ -63,6 +66,17 @@ public class DocumentFragment extends RootFragment {
 		// Set adapter for list view
 		mAdapter = new DocumentListAdapter();
 		mLstDoc.setAdapter(mAdapter);
+		
+		// Set document item click event
+		mLstDoc.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			
+				DetailDocumentActivity.newInstance(mAdapter.getItem(position), (MainActivity) getActivity());
+			}
+		});
+		
 		
 		// Set drop event, reorder document list
 		mLstDoc.setDropListener(new DropListener() {
@@ -97,11 +111,9 @@ public class DocumentFragment extends RootFragment {
 			@Override
 			public void onClick(View v) {
 
-				((MainActivity) getActivity()).takePhoto();
+				((MainActivity) getActivity()).takePhoto(CameraActivity.RESULT_CODE_NEW_DOC);
 			}
 		});
-	
-		super.onActivityCreated(savedInstanceState);
 	}
 	
 	@Override

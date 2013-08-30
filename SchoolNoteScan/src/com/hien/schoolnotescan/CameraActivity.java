@@ -11,10 +11,6 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-
-import com.hien.schoolnotescan.LayerManager.BoxState;
-import com.hien.schoolnotescan.LayerManager.Stage;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -27,27 +23,25 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
+
+import com.hien.schoolnotescan.LayerManager.BoxState;
 
 public class CameraActivity extends Activity {
 	
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	
-	public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-	
-	public static final int REQUEST_CODE = 111;
-	
-	public static final int RESULT_CODE_RETAKE = 113;
-	public static final int RESULT_CODE_NEW_DOC = 114;
-	public static final int RESULT_CODE_ADD_DOC = 115;
+	public static final int REQUEST_CODE = GlobalVariable.CAMERA_ACTIVITY_REQUEST_CODE;
+
+	public static final int RESULT_CODE_NEW_DOC = REQUEST_CODE + 1; 
+	public static final int RESULT_CODE_ADD_DOC = REQUEST_CODE + 2;
+	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = REQUEST_CODE + 3;	
 	
 	private CoreCanvas mCanvas;
-	private int mRequestMode = RESULT_CODE_NEW_DOC;
+	private int mRequestMode;
 	
 	private Uri fileUri;
 	
@@ -98,8 +92,8 @@ public class CameraActivity extends Activity {
 			
 			@Override
 			public void onClick(View arg0) {
-				setResult(RESULT_CODE_RETAKE);
-				finish();
+				
+				takePhoto();
 			}
 		});
 		

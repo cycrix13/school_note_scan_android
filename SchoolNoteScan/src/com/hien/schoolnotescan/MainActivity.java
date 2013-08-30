@@ -153,14 +153,6 @@ public class MainActivity extends FragmentActivity {
     	mCore.release();
     	super.onDestroy();
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        
-        return true;
-    }
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -171,15 +163,11 @@ public class MainActivity extends FragmentActivity {
     	
     	case FlashActivity.REQUEST_CODE:
     		if (resultCode == FlashActivity.RESULT_CODE_RETAKE) 
-    			takePhoto();
+    			takePhoto(CameraActivity.RESULT_CODE_NEW_DOC);
     		break;
     		
     	case CameraActivity.REQUEST_CODE:
     		switch (resultCode) {
-    		
-    		case CameraActivity.RESULT_CODE_RETAKE:
-    			takePhoto();
-    			break;
     			
     		case CameraActivity.RESULT_CODE_NEW_DOC:
     			// get box list from static field
@@ -237,10 +225,14 @@ public class MainActivity extends FragmentActivity {
     	}
     }
 
-	public void takePhoto() {
+	/**
+	 * 
+	 * @param mode CameraActivity.RESULT_CODE_NEW_DOC or CameraActivity.RESULT_CODE_ADD_DOC 
+	 */
+	public void takePhoto(int mode) {
 
 		Intent i = new Intent(this, CameraActivity.class);
-		i.putExtra("mode", CameraActivity.RESULT_CODE_NEW_DOC);
+		i.putExtra("mode", mode);
 		startActivityForResult(i, CameraActivity.REQUEST_CODE);
 	}
     

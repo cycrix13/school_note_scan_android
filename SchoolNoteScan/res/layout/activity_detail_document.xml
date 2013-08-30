@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
+    android:background="#FFFFFF"
     tools:context=".MainActivity" >
 
     <RelativeLayout
@@ -14,22 +14,24 @@
 
         <Button
             android:id="@+id/btnEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="32dp"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
             android:background="@drawable/button_iphone_default"
             android:text="Edit"
+            android:textColor="#FFFFFF"
             android:textStyle="bold" />
 
         <Button
             android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="48dp"
+            android:layout_height="32dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
             android:background="@drawable/button_iphone_default"
             android:text="Back"
+            android:textColor="#FFFFFF"
             android:textStyle="bold" />
 
         <TextView
@@ -40,25 +42,132 @@
             android:layout_toLeftOf="@+id/btnEdit"
             android:layout_toRightOf="@+id/btnBack"
             android:gravity="center_horizontal"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
             android:singleLine="true"
             android:text="Note 1"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:shadowColor="#000000"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2"  />
-
+            android:textStyle="bold" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/layoutContent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/relativeLayout3"
         android:layout_below="@+id/RelativeLayout1"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp" >
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/background_edit"
+            android:paddingBottom="12dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="16dp"
+            android:paddingTop="12dp" >
+
+            <ImageButton
+                android:id="@+id/btnInfo"
+                android:layout_width="27dp"
+                android:layout_height="27dp"
+                android:layout_centerVertical="true"
+                android:background="#00000000"
+                android:scaleType="centerCrop"
+                android:src="@drawable/icon_info" />
+
+            <ImageButton
+                android:id="@+id/imageButton2"
+                android:layout_width="27dp"
+                android:layout_height="26dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="#00000000"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_edit" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@+id/btnInfo"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Note2"
+                    android:textColor="#000000"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No tag"
+                    android:textColor="#000000" />
+            </LinearLayout>
+
+        </RelativeLayout>
+        
+        <com.mobeta.android.dslv.DragSortListView
+            android:id="@+id/lstBox"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/relativeLayout2"
+            android:layout_margin="3dp"
+            android:divider="@drawable/doc_list_divider"
+            android:dividerHeight="1px"
+            android:padding="3dp"
+            dslv:click_remove_id="@+id/imgDelete"
+            dslv:collapsed_height="2dp"
+            dslv:drag_enabled="true"
+            dslv:drag_handle_id="@+id/imgReorder"
+            dslv:drag_scroll_start="0.33"
+            dslv:float_background_color="#FFFFFF"
+            dslv:max_drag_scroll_speed="0.5"
+            dslv:remove_enabled="true"
+            dslv:remove_mode="clickRemove"
+            dslv:slide_shuffle_speed="0.3" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/footer"
+        android:padding="8dp" >
+
+        <ImageButton
+            android:id="@+id/imageButton3"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_iphone_default"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon_plus" />
+
+        <ImageButton
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_iphone_default"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon_export" />
 
     </RelativeLayout>
 
