@@ -1,38 +1,37 @@
 package com.hien.schoolnotescan;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.WeakHashMap;
 
-import com.hien.schoolnotescan.LayerManager.BoxState;
-import com.mobeta.android.dslv.DragSortItemView;
-import com.mobeta.android.dslv.DragSortListView;
-import com.mobeta.android.dslv.DragSortListView.DropListener;
-import com.mobeta.android.dslv.DragSortListView.RemoveListener;
-
-import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnDragListener;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class DocumentFragment extends RootFragment {
+import com.hien.schoolnotescan.CameraActivity.Listener;
+import com.hien.schoolnotescan.LayerManager.BoxState;
+import com.mobeta.android.dslv.DragSortListView;
+import com.mobeta.android.dslv.DragSortListView.DropListener;
+import com.mobeta.android.dslv.DragSortListView.RemoveListener;
+
+public class DocumentFragment extends RootFragment implements Listener {
 	
 	private DragSortListView 		mLstDoc;
 	private DocumentListAdapter 	mAdapter;
-	private List<Document> 			mDocList = new ArrayList<Document>();
+	private DocumentManager			mDocManager;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method
@@ -50,18 +49,8 @@ public class DocumentFragment extends RootFragment {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		
+		mDocManager = new DocumentManager((MainActivity) getActivity());
 		mLstDoc = (DragSortListView) getView().findViewById(R.id.lstDoc);
-		
-		// test data
-		mDocList.add(new Document());
-		mDocList.add(new Document());
-		mDocList.add(new Document());
-		mDocList.add(new Document());
-		mDocList.add(new Document());
-		
-		for (int i = 0; i < mDocList.size(); i++) {
-			mDocList.get(i).mName = "Note" + (i + 1);
-		}
 		
 		// Set adapter for list view
 		mAdapter = new DocumentListAdapter();
@@ -73,11 +62,10 @@ public class DocumentFragment extends RootFragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			
-				DetailDocumentActivity.newInstance(mAdapter.getItem(position), (MainActivity) getActivity());
+				DetailDocumentActivity.newInstance(mAdapter.getItem(position), mDocManager, (MainActivity) getActivity());
 			}
 		});
-		
-		
+
 		// Set drop event, reorder document list
 		mLstDoc.setDropListener(new DropListener() {
 			
@@ -90,7 +78,11 @@ public class DocumentFragment extends RootFragment {
 				Document doc = mAdapter.getItem(from);
 				mAdapter.remove(doc);
 				mAdapter.insert(doc, to);
-				
+				try {
+					mDocManager.save(getActivity());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -101,6 +93,11 @@ public class DocumentFragment extends RootFragment {
 			public void remove(int which) {
 				
 				mAdapter.remove(mAdapter.getItem(which));
+				try {
+					mDocManager.save(getActivity());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -111,15 +108,33 @@ public class DocumentFragment extends RootFragment {
 			@Override
 			public void onClick(View v) {
 
-				((MainActivity) getActivity()).takePhoto(CameraActivity.RESULT_CODE_NEW_DOC);
+				CameraActivity.newInstance(getActivity(), DocumentFragment.this);
 			}
 		});
+	}
+	
+	@Override
+	public void onResume() {
+	
+		super.onResume();
+		mAdapter.notifyDataSetChanged();
 	}
 	
 	@Override
 	public boolean canEdit() {
 
 		return true;
+	}
+	
+	@Override
+	public void newDocCameraCallback(List<BoxState> boxList, Bitmap bm) {
+		
+		addNewDoc(boxList, bm);
+	}
+
+	@Override
+	public void cancelCameraCallback() {
+		
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -135,14 +150,76 @@ public class DocumentFragment extends RootFragment {
 		((MainActivity) getActivity()).updateEditButtonState();
 	}
 	
-	public void addNewDoc(List<BoxState> boxList) {
+	public void addNewDoc(List<BoxState> boxList, Bitmap bm) {
 
 		Document doc = new Document();
 		doc.mName = "new note";
+		Bitmap bmPreview = makePreview(bm);
+		try {
+			doc.mPreviewPath = DocumentManager.saveBitmap(bmPreview, getActivity());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
-		// Add note bitmaps
-		
+		// Add preview bitmaps
 		mAdapter.add(doc);
+		
+		// Add box bitmap
+		for (BoxState box : boxList) {
+			
+			// Extract box bitmap
+			Rect r 	 = new Rect();
+			r.left 	 = Math.max(0, box.pos.x);
+			r.top  	 = Math.max(0, box.pos.y);
+			r.right  = Math.min(bm.getWidth(), r.left + box.size.x);
+			r.bottom = Math.min(bm.getHeight(), r.top + box.size.y);
+			
+			Bitmap bmBox = Bitmap.createBitmap(bm, r.left, r.top, r.right - r.left, r.bottom - r.top);
+			
+			// Save to file
+			String boxPath = null;
+			try {
+				boxPath = DocumentManager.saveBitmap(bmBox, getActivity());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			// Add to document
+			doc.mNotePathArr.add(boxPath);
+		}
+		
+		// Save
+		try {
+			mDocManager.save(getActivity());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Private method
+	///////////////////////////////////////////////////////////////////////////
+	
+	private Bitmap makePreview(Bitmap bm) {
+		
+		int newW = 0;
+		int newH = 0;
+		if (bm.getWidth() > bm.getHeight()) {
+			// scale as width
+			newW = newH = bm.getHeight();
+		} else {
+			// scale as height
+			newW = newH = bm.getWidth();
+		}
+		
+		Bitmap newBm = Bitmap.createBitmap(
+				GlobalVariable.PREVIEW_SIZE, GlobalVariable.PREVIEW_SIZE, Config.ARGB_8888);
+		Canvas canvas = new Canvas(newBm);
+		canvas.drawBitmap(bm, 
+				new Rect((bm.getWidth() - newW) / 2, (bm.getHeight() - newH) / 2, newW, newH),
+				new Rect(0, 0, newBm.getWidth(), newBm.getHeight()), null);
+		
+		return newBm;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -151,11 +228,11 @@ public class DocumentFragment extends RootFragment {
 	
 	public class DocumentListAdapter extends ArrayAdapter<Document> {
 		
-		private LayoutInflater mInflater;
+		private WeakHashMap<String, Bitmap> mBitmapCache;
 		
 		public DocumentListAdapter() {
-			super(DocumentFragment.this.getActivity(), R.layout.document_item, R.id.txtName, mDocList);
-			mInflater = DocumentFragment.this.getActivity().getLayoutInflater();
+			super(DocumentFragment.this.getActivity(), R.layout.document_item, R.id.txtName, mDocManager.mDocList);
+			mBitmapCache = new WeakHashMap<String, Bitmap>();
 		}
 		
 		@Override
@@ -171,10 +248,20 @@ public class DocumentFragment extends RootFragment {
 			ImageView imgPreview = (ImageView) v.findViewById(R.id.imgPreview);
 			
 			txtName.setText(doc.mName);
-			txtTime.setText(doc.mDate.toString());
-			txtDocNum.setText("" + doc.mBmNoteArr.size());
-			if (doc.mBmDocument != null)
-				imgPreview.setImageBitmap(doc.mBmDocument);
+			txtTime.setText(DocumentManager.date2String(doc.mDate));
+			txtDocNum.setText("" + doc.mNotePathArr.size());
+			if (doc.mPreviewPath != null) {
+				// check cache
+				Bitmap bm = mBitmapCache.get(doc.mPreviewPath);
+				
+				if (bm == null) {
+					// miss
+					bm = BitmapFactory.decodeFile(getActivity()
+							.getFileStreamPath(doc.mPreviewPath).getAbsolutePath());
+					mBitmapCache.put(doc.mPreviewPath, bm);
+				}
+				imgPreview.setImageBitmap(bm);
+			}
 			
 			// Set visibility for reorder and delete button
 			View imgReorder = v.findViewById(R.id.imgReorder);

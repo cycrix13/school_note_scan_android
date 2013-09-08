@@ -8,13 +8,12 @@ import android.graphics.Bitmap;
 
 public class Document {
 	
-	public Bitmap 		mBmDocument;
+	public String 		mPreviewPath;
 	public String 		mName;
 	public Date 		mDate = new Date();
-	public List<Bitmap> mBmNoteArr = new ArrayList<Bitmap>();
+	public List<String> mNotePathArr = new ArrayList<String>();
 	
 	public Document() {
-		
 		
 	}
 	

@@ -1,14 +1,17 @@
 package com.hien.schoolnotescan;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -26,9 +29,11 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.hien.schoolnotescan.CameraActivity.Listener;
+import com.hien.schoolnotescan.LayerManager.BoxState;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements Listener {
 	
 	private static final String  TAG = "MainActivity";
 	
@@ -66,6 +71,8 @@ public class MainActivity extends FragmentActivity {
     private RestorePurchaseFragment mRestoreFrag;
     private UnlockPremiumFragment 	mUnlockFrag;
     private RootFragment			mActiveFrag;
+    
+    private WebServer				mWebServer;
     
     ///////////////////////////////////////////////////////////////////////////
     // Override method
@@ -143,14 +150,20 @@ public class MainActivity extends FragmentActivity {
         		t.hide(f);
         t.commit();
         
-        // Add document fragment as default
-//        getSupportFragmentManager().beginTransaction().add(R.id.layoutContent, mDocFrag).commit();
+        // Start web server
+        mWebServer = new WebServer();
+        try {
+			mWebServer.start();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
     
     @Override
     protected void onDestroy() {
     	
     	mCore.release();
+    	mWebServer.stop();
     	super.onDestroy();
     }
     
@@ -162,24 +175,22 @@ public class MainActivity extends FragmentActivity {
     	switch (requestCode) {
     	
     	case FlashActivity.REQUEST_CODE:
-    		if (resultCode == FlashActivity.RESULT_CODE_RETAKE) 
-    			takePhoto(CameraActivity.RESULT_CODE_NEW_DOC);
-    		break;
-    		
-    	case CameraActivity.REQUEST_CODE:
-    		switch (resultCode) {
-    			
-    		case CameraActivity.RESULT_CODE_NEW_DOC:
-    			// get box list from static field
-    			mDocFrag.addNewDoc(CameraActivity.boxList);
-    			break;
-    			
-    		case CameraActivity.RESULT_CODE_ADD_DOC:
-    			break;
-    		}
+    		if (resultCode == FlashActivity.RESULT_CODE_RETAKE)
+    			CameraActivity.newInstance(this, this);
     		break;
     	}
-    }    
+    }
+    
+    @Override
+	public void newDocCameraCallback(List<BoxState> boxList, Bitmap bm) {
+
+		mDocFrag.addNewDoc(boxList, bm);
+	}
+
+	@Override
+	public void cancelCameraCallback() {
+		
+	}
 
 	///////////////////////////////////////////////////////////////////////////
 	// Public method
@@ -223,19 +234,8 @@ public class MainActivity extends FragmentActivity {
     	} else if (mActiveFrag == mUnlockFrag) {
     		txtTitle.setText("Unlock Premium");
     	}
-    }
+    }	
 
-	/**
-	 * 
-	 * @param mode CameraActivity.RESULT_CODE_NEW_DOC or CameraActivity.RESULT_CODE_ADD_DOC 
-	 */
-	public void takePhoto(int mode) {
-
-		Intent i = new Intent(this, CameraActivity.class);
-		i.putExtra("mode", mode);
-		startActivityForResult(i, CameraActivity.REQUEST_CODE);
-	}
-    
 	///////////////////////////////////////////////////////////////////////////
 	// side menu event handler
 	///////////////////////////////////////////////////////////////////////////

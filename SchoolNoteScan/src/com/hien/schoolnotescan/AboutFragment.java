@@ -15,19 +15,7 @@ public class AboutFragment extends RootFragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View v = inflater.inflate(R.layout.about_frag, container);
 		
-		return v;
+		return inflater.inflate(R.layout.about_frag, container);
 	}
-	
-	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-	
-		super.onActivityCreated(savedInstanceState);
-	}
-	
-	///////////////////////////////////////////////////////////////////////////
-	// Public method
-	///////////////////////////////////////////////////////////////////////////
-	
 }

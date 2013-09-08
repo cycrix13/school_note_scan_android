@@ -7,5 +7,6 @@
     <string name="title_activity_flash">FlashActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_detail_document">DetailDocumentActivity</string>
+    <string name="title_activity_help_answer">HelpAnswerActivity</string>
 
 </resources>

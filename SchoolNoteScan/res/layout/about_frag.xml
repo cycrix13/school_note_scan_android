@@ -2,21 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:background="#E7E7E7"
+    android:orientation="vertical"
+    android:padding="8dp" >
 
-    <RelativeLayout
+    <ScrollView
+        android:id="@+id/scrollView1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:background="@drawable/about_box" >
 
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="About fragment"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
-    </RelativeLayout>
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Welcome to the School Note Scan App. Our goal is to make note taking and studying easier by allowing you to capture what you think is &quot;Good&quot; content.\n
+\n
+Highlighting your notes allows you to review relevant information so you can cut out the stuff you don&apos;t want to read again, and read the important stuff. Now you can use School Note Scan to take the highlighted information and create bullet-form notes to help you study more effectively. There is no need to type out your notes any more when you ca simply scan your highlighted notes.\n
+\n
+There are two versions of School Note Scan:\n
+\n
+The full version costs a mind boggling $0.99. This version is ready-to-go for you to start scanning your highlighted notes.\n
+\n
+The Lite version is free (its on us because we want you to be satisfied, and we want to keep improving the app (: ). This version allows you to scan up to 10 pages.\n
+\n
+For more information, please visit us at: www.SchoolNoteScan.com"
+                android:textColor="#000000"
+                android:textSize="15sp" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

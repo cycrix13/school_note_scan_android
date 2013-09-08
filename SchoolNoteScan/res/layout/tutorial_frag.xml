@@ -4,19 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/imageView1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="Tutorial fragment"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    </RelativeLayout>
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/tutorial_page" />
 
 </LinearLayout>

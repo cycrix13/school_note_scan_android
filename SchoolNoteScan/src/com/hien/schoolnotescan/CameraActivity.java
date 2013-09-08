@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.crypto.Mac;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -17,12 +19,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -38,15 +42,16 @@ public class CameraActivity extends Activity {
 
 	public static final int RESULT_CODE_NEW_DOC = REQUEST_CODE + 1; 
 	public static final int RESULT_CODE_ADD_DOC = REQUEST_CODE + 2;
-	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = REQUEST_CODE + 3;	
+	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = REQUEST_CODE + 3;
 	
-	private CoreCanvas mCanvas;
-	private int mRequestMode;
+	private static Activity sAct;
+	private static Listener sListener;
+	
+	private CoreCanvas 	mCanvas;
+	private Activity 	mAct;
+	private Listener 	mListener;
 	
 	private Uri fileUri;
-	
-	// Static fields for passing object between activity
-	public static List<BoxState> boxList;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method
@@ -57,18 +62,25 @@ public class CameraActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_camera);
 		
-		// Get request mode
-		mRequestMode = getIntent().getIntExtra("mode", 0);
+		// Get main activity + listener
+		mAct = sAct;
+		mListener = sListener;
 		
-		// If request mode is not specified, then error
-		if (mRequestMode == 0)
-			throw new RuntimeException("parameter \"mode\" not found, do you forget to pass it?");
+		// Clean up static fields to avoid memory leak
+		sAct = null;
+		sListener = null;
 		
+		// Get CoreCanvas
+		mCanvas = (CoreCanvas) findViewById(R.id.canvas);
+		
+		// Set parent size change event
+		findViewById(R.id.layoutCanvas).addOnLayoutChangeListener(mCanvas);
+				
 		// Call camera intent
 		takePhoto();	
 		
 		// Set add box event
-		((Button) findViewById(R.id.btnAddbox)).setOnClickListener(new OnClickListener() {
+		((Button) findViewById(R.id.btnAddBox)).setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View arg0) {
@@ -118,9 +130,29 @@ public class CameraActivity extends Activity {
     	case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
     		if (resultCode == RESULT_OK) {
     			
-    			// rotate bitmap 90 degrees
     			String path = fileUri.getPath();
-    			Bitmap bitmap = BitmapFactory.decodeFile(path);
+    			
+    			// calculate optimize scale
+    			Display display = getWindowManager().getDefaultDisplay();
+    			int w = display.getWidth();
+    			int h = display.getHeight();
+    			int scale = 1;
+    			Options opt = new Options();
+    			opt.inJustDecodeBounds = true;
+    			Bitmap bitmap = BitmapFactory.decodeFile(path, opt);
+    			
+    			while (opt.outWidth / 2 > h && opt.outHeight / 2 > w) {
+    				scale = scale << 1;
+    				opt.outWidth = opt.outWidth >> 1;
+    				opt.outHeight = opt.outHeight >> 1;
+    			}
+    			
+    			// Decode photo with scale
+    			opt = new Options();
+    			opt.inSampleSize = scale;
+    			bitmap = BitmapFactory.decodeFile(path, opt);
+    			
+    			// rotate bitmap 90 degrees
     			Mat mat = new Mat();
     			Utils.bitmapToMat(bitmap, mat);
     			Mat matT = mat.t();
@@ -129,23 +161,24 @@ public class CameraActivity extends Activity {
     			
     			Bitmap bitmap2 = Bitmap.createBitmap(matT.cols(), matT.rows(), Config.ARGB_8888);
     			Utils.matToBitmap(matFlip, bitmap2);
-    			mCanvas = (CoreCanvas) findViewById(R.id.canvas);
     			mCanvas.setBg(bitmap2);
-    			
-    			// detect
-    			drawRectOnImg(matFlip, detectRect(matFlip));
     			
     			// cleanup
     			mat.release();
     			matT.release();
     			matFlip.release();
     			bitmap.recycle();
+    			
             } else if (resultCode == RESULT_CANCELED) {
             	
                 // User cancelled the image capture
+            	mListener.cancelCameraCallback();
+            	finish();
             } else {
             	
                 // Image capture failed, advise user
+            	mListener.cancelCameraCallback();
+            	finish();
             }
     		break;
     	}
@@ -155,7 +188,18 @@ public class CameraActivity extends Activity {
 	// Public method
 	///////////////////////////////////////////////////////////////////////////
 
-	
+	/**
+	 * 
+	 * @param act
+	 * @param mode CameraActivity.RESULT_CODE_NEW_DOC or CameraActivity.RESULT_CODE_ADD_DOC 
+	 */
+	public static void newInstance(Activity act, Listener listener) {
+		
+		Intent i = new Intent(act, CameraActivity.class);
+		sAct = act;
+		sListener = listener;
+		act.startActivityForResult(i, CameraActivity.REQUEST_CODE);
+	}
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Private method
@@ -181,44 +225,22 @@ public class CameraActivity extends Activity {
 			prg.setVisibility(View.GONE);
 	}
 	
-	private void drawRectOnImg(Mat img, List<Rect> rectList) {
-		
-		for (Rect rect : rectList) {
-			
-			mCanvas.addBoxWithoutStage(new Point(rect.x, rect.y), 
-					new Point(rect.width, rect.height));
-		}
-	}
-	
-	private List<Rect> detectRect(Mat img) {
-		
-		List<Rect> rectList = new ArrayList<Rect>();
-		MainActivity.mCore.detectRect(img, rectList);
-		return rectList;
-	}
-	
 	private void onFinishClick() {
 		
-		switch (mRequestMode) {
+		List<BoxState> boxList = mCanvas.mLayerManager.new Stage().mBoxStateList;
 
-			// create new document after finish this activity
-			// used in Flash screen and Document screen scenarios
-			case RESULT_CODE_NEW_DOC:
-				setResult(mRequestMode);
-				// assign static field to pass boxList to MainActivity 
-				boxList = mCanvas.mLayerManager.new Stage().mBoxStateList;
-				finish();
-				break;
-				
-			// create boxes into an existed document after finish this activity
-			// used in DocumentDetail screen scenario
-			case RESULT_CODE_ADD_DOC:
-				setResult(mRequestMode);
-				// assign static field to pass boxList to MainActivity
-				boxList = mCanvas.mLayerManager.new Stage().mBoxStateList;
-				finish();
-				break;
-		}
+		mListener.newDocCameraCallback(boxList, mCanvas.mBg);
+		finish();
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Inner class
+	///////////////////////////////////////////////////////////////////////////
+	
+	public interface Listener {
+		
+		public void newDocCameraCallback(List<BoxState> boxList, Bitmap bm);
+		public void cancelCameraCallback();
 	}
 	
     ///////////////////////////////////////////////////////////////////////////
