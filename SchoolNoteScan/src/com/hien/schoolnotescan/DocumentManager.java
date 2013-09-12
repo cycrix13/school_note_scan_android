@@ -45,6 +45,19 @@ public class DocumentManager {
 		}
 	}
 	
+	public String generateDocName() {
+	
+		int i = 1;
+		
+		do {
+			String name = "Note " + i;
+			Document doc = getDocByName(name);
+			if (doc == null)
+				return name;
+			i++;
+		} while(true);
+	}
+	
 	public static String generateRandomImageFileName(Activity act) {
 		
 		Random random = new Random(System.currentTimeMillis());
@@ -164,6 +177,15 @@ public class DocumentManager {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		
+		return null;
+	}
+	
+	public Document getDocByName(String name) {
+		
+		for (Document doc : mDocList)
+			if (doc.mName.equalsIgnoreCase(name))
+				return doc;
 		
 		return null;
 	}

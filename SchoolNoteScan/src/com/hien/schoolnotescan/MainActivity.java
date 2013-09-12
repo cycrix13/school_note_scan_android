@@ -72,8 +72,6 @@ public class MainActivity extends FragmentActivity implements Listener {
     private UnlockPremiumFragment 	mUnlockFrag;
     private RootFragment			mActiveFrag;
     
-    private WebServer				mWebServer;
-    
     ///////////////////////////////////////////////////////////////////////////
     // Override method
     ///////////////////////////////////////////////////////////////////////////
@@ -149,21 +147,12 @@ public class MainActivity extends FragmentActivity implements Listener {
         	if (f != mActiveFrag)
         		t.hide(f);
         t.commit();
-        
-        // Start web server
-        mWebServer = new WebServer();
-        try {
-			mWebServer.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
     }
     
     @Override
     protected void onDestroy() {
     	
     	mCore.release();
-    	mWebServer.stop();
     	super.onDestroy();
     }
     

@@ -32,9 +32,11 @@ public class HelpAnswerActivity extends Activity {
 		sQuestion = null;
 		sAnswer = null;
 		
+		TextView txtQuestion = (TextView) findViewById(R.id.txtQuestion);
 		TextView txtAnswer = (TextView) findViewById(R.id.txtAnswer);
 		Button btnBack = (Button) findViewById(R.id.btnBack); 
 		
+		txtQuestion.setText(mQuestion);
 		txtAnswer.setText(mAnswer);
 		
 		btnBack.setOnClickListener(new OnClickListener() {

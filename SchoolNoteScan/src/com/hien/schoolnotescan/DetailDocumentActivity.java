@@ -1,5 +1,6 @@
 package com.hien.schoolnotescan;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -8,11 +9,14 @@ import org.json.JSONException;
 
 import com.hien.schoolnotescan.CameraActivity.Listener;
 import com.hien.schoolnotescan.LayerManager.BoxState;
+import com.hien.schoolnotescan.R.layout;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.DropListener;
 import com.mobeta.android.dslv.DragSortListView.RemoveListener;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,6 +35,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DetailDocumentActivity extends Activity implements Listener {
 	
@@ -55,6 +60,11 @@ public class DetailDocumentActivity extends Activity implements Listener {
 	private TextView 		txtTitle;
 	private TextView 		txtName;
 	private TextView 		txtTag;
+	private View			layoutExport;
+	private ImageButton		btnEmail;
+	private ImageButton		btnPrinter;
+	private ImageButton		btnDropBox;
+	private ImageButton		btnGoogleDrive;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method
@@ -128,6 +138,58 @@ public class DetailDocumentActivity extends Activity implements Listener {
 	
 	public void onExportClick() {
 		
+		int visibility = layoutExport.getVisibility();
+		switch (visibility) {
+		case View.VISIBLE:
+			visibility = View.GONE;
+			break;
+		case View.INVISIBLE:
+		case View.GONE:
+			visibility = View.VISIBLE;
+			break;
+		}
+		layoutExport.setVisibility(visibility);
+	}
+	
+	public void onEmailExport() {
+		
+		// Hide export menu
+		layoutExport.setVisibility(View.GONE);
+		
+		// Render pdf
+		File shareDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+		shareDir.mkdirs();
+		String pdfPath = shareDir.getAbsolutePath() + "/" + mDoc.mName + ".pdf";
+		PdfHelper.RenderPdf(mDoc.mNotePathArr, pdfPath, this, 0);
+		
+		// Call email intent
+		Intent i = new Intent(Intent.ACTION_SEND);
+		i.setType("message/rfc822");
+		i.putExtra(Intent.EXTRA_SUBJECT, "[School Note Scan] " + mDoc.mName);
+		i.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + pdfPath));
+		try {
+		    startActivity(Intent.createChooser(i, "Send mail..."));
+		} catch (android.content.ActivityNotFoundException ex) {
+		    Toast.makeText(this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	public void onPrinterExport() {
+
+		layoutExport.setVisibility(View.GONE);
+		Toast.makeText(this, "Under construction!", Toast.LENGTH_SHORT).show();
+	}
+
+	public void onDropBoxExport() {
+
+		layoutExport.setVisibility(View.GONE);
+		Toast.makeText(this, "Under construction!", Toast.LENGTH_SHORT).show();
+	}
+
+	public void onGoogleDriveExport() {
+
+		layoutExport.setVisibility(View.GONE);
+		Toast.makeText(this, "Under construction!", Toast.LENGTH_SHORT).show();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -140,6 +202,11 @@ public class DetailDocumentActivity extends Activity implements Listener {
 		txtTitle 	= (TextView) findViewById(R.id.txtTitle);
 		txtTag 		= (TextView) findViewById(R.id.txtTag);
 		mLst 		= (DragSortListView) findViewById(R.id.lstBox);
+		layoutExport= findViewById(R.id.layoutExport);
+		btnEmail	= (ImageButton) findViewById(R.id.btnEmail);
+		btnPrinter	= (ImageButton) findViewById(R.id.btnPrinter);
+		btnDropBox	= (ImageButton) findViewById(R.id.btnDropBox);
+		btnGoogleDrive	= (ImageButton) findViewById(R.id.btnGoogleDrive);
 	}
 	
 	private void updateLayout() {
@@ -192,6 +259,50 @@ public class DetailDocumentActivity extends Activity implements Listener {
 			public void onClick(View arg0) {
 
 				onExportClick();
+			}
+		});
+		
+		// Set export button event
+		((ImageButton) findViewById(R.id.btnEmail))
+		.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				onEmailExport();
+			}
+		});
+		
+		// Set export button event
+		((ImageButton) findViewById(R.id.btnPrinter))
+		.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				onPrinterExport();
+			}
+		});
+		
+		// Set export button event
+		((ImageButton) findViewById(R.id.btnDropBox))
+		.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				onDropBoxExport();
+			}
+		});
+		
+		// Set export button event
+		((ImageButton) findViewById(R.id.btnGoogleDrive))
+		.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				onGoogleDriveExport();
 			}
 		});
 	}

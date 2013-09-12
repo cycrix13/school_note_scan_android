@@ -31,7 +31,7 @@ public class DocumentFragment extends RootFragment implements Listener {
 	
 	private DragSortListView 		mLstDoc;
 	private DocumentListAdapter 	mAdapter;
-	private DocumentManager			mDocManager;
+	public DocumentManager			mDocManager;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method
@@ -153,7 +153,7 @@ public class DocumentFragment extends RootFragment implements Listener {
 	public void addNewDoc(List<BoxState> boxList, Bitmap bm) {
 
 		Document doc = new Document();
-		doc.mName = "new note";
+		doc.mName = mDocManager.generateDocName();
 		Bitmap bmPreview = makePreview(bm);
 		try {
 			doc.mPreviewPath = DocumentManager.saveBitmap(bmPreview, getActivity());

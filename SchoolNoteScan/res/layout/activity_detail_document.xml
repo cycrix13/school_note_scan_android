@@ -176,4 +176,39 @@
 
     </RelativeLayout>
 
+    <LinearLayout
+        android:id="@+id/layoutExport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout3"
+        android:gravity="right"
+        android:padding="10dp"
+        android:visibility="gone" >
+
+        <ImageButton
+            android:id="@+id/btnEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_email" />
+
+        <ImageButton
+            android:id="@+id/btnPrinter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_printer" />
+
+        <ImageButton
+            android:id="@+id/btnDropBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_dropbox" />
+
+        <ImageButton
+            android:id="@+id/btnGoogleDrive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/btn_googledrive" />
+
+    </LinearLayout>
+
 </RelativeLayout>
