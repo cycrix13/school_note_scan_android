@@ -5,17 +5,14 @@ import java.util.List;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.core.MatOfRect;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.Bitmap.Config;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -75,7 +72,7 @@ public class CoreCanvas extends SurfaceView implements SurfaceHolder.Callback, O
 	public void onLayoutChange(View v, int left, int top, int right,
 			int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 		
-		if (!mCreated && mBg != null) {
+//		if (!mCreated) {
 			mParentSize = new Point(right - left, bottom - top);
 //			mBg = processBg(mBg);
 //			setSize();
@@ -83,7 +80,7 @@ public class CoreCanvas extends SurfaceView implements SurfaceHolder.Callback, O
 //			Utils.bitmapToMat(mBg, mat);
 //			drawRectOnImg(mat, detectRect(mat));
 //			mat.release();
-		}
+//		}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

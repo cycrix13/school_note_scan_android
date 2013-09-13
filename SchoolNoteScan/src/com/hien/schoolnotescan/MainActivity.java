@@ -1,9 +1,5 @@
 package com.hien.schoolnotescan;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -12,16 +8,12 @@ import org.opencv.android.OpenCVLoader;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -84,9 +76,15 @@ public class MainActivity extends FragmentActivity implements Listener {
         // Init OpenCV
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
         
-        // Start flash screen
-        Intent intent = new Intent(this, FlashActivity.class);
-        startActivityForResult(intent, FlashActivity.REQUEST_CODE);
+        // Load config
+        ConfigHelper.InitInstance(this);
+        
+        if (ConfigHelper.instance().showSplash) {
+        	
+        	// Start flash screen
+        	Intent intent = new Intent(this, FlashActivity.class);
+        	startActivityForResult(intent, FlashActivity.REQUEST_CODE);
+        }
         
         // Create side menu
         mSideMenu = new SlidingMenu(this);
@@ -153,6 +151,8 @@ public class MainActivity extends FragmentActivity implements Listener {
     protected void onDestroy() {
     	
     	mCore.release();
+    	mCore = null;
+    	ConfigHelper.release();
     	super.onDestroy();
     }
     
@@ -163,10 +163,6 @@ public class MainActivity extends FragmentActivity implements Listener {
     	
     	switch (requestCode) {
     	
-    	case FlashActivity.REQUEST_CODE:
-    		if (resultCode == FlashActivity.RESULT_CODE_RETAKE)
-    			CameraActivity.newInstance(this, this);
-    		break;
     	}
     }
     

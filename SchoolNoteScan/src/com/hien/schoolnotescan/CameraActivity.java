@@ -2,20 +2,17 @@ package com.hien.schoolnotescan;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.crypto.Mac;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Rect;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -36,20 +33,23 @@ import com.hien.schoolnotescan.LayerManager.BoxState;
 
 public class CameraActivity extends Activity {
 	
+	public static final int SELECT_PICTURE = 201;
+	
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	
 	public static final int REQUEST_CODE = GlobalVariable.CAMERA_ACTIVITY_REQUEST_CODE;
 
-	public static final int RESULT_CODE_NEW_DOC = REQUEST_CODE + 1; 
-	public static final int RESULT_CODE_ADD_DOC = REQUEST_CODE + 2;
+	public static final int MODE_CAMERA = 1;
+	public static final int MODE_FILE = 2;
+	
 	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = REQUEST_CODE + 3;
 	
-	private static Activity sAct;
 	private static Listener sListener;
+	private static int 		sMode;
 	
 	private CoreCanvas 	mCanvas;
-	private Activity 	mAct;
 	private Listener 	mListener;
+	private int 		mMode;
 	
 	private Uri fileUri;
 	
@@ -63,11 +63,10 @@ public class CameraActivity extends Activity {
 		setContentView(R.layout.activity_camera);
 		
 		// Get main activity + listener
-		mAct = sAct;
 		mListener = sListener;
+		mMode = sMode;
 		
 		// Clean up static fields to avoid memory leak
-		sAct = null;
 		sListener = null;
 		
 		// Get CoreCanvas
@@ -77,7 +76,16 @@ public class CameraActivity extends Activity {
 		findViewById(R.id.layoutCanvas).addOnLayoutChangeListener(mCanvas);
 				
 		// Call camera intent
-		takePhoto();	
+		switch (mMode) {
+		case MODE_CAMERA:
+			takePhoto();
+			break;
+			
+		case MODE_FILE:
+			openGallary();
+			break;
+		}
+		
 		
 		// Set add box event
 		((Button) findViewById(R.id.btnAddBox)).setOnClickListener(new OnClickListener() {
@@ -131,43 +139,7 @@ public class CameraActivity extends Activity {
     		if (resultCode == RESULT_OK) {
     			
     			String path = fileUri.getPath();
-    			
-    			// calculate optimize scale
-    			Display display = getWindowManager().getDefaultDisplay();
-    			int w = display.getWidth();
-    			int h = display.getHeight();
-    			int scale = 1;
-    			Options opt = new Options();
-    			opt.inJustDecodeBounds = true;
-    			Bitmap bitmap = BitmapFactory.decodeFile(path, opt);
-    			
-    			while (opt.outWidth / 2 > h && opt.outHeight / 2 > w) {
-    				scale = scale << 1;
-    				opt.outWidth = opt.outWidth >> 1;
-    				opt.outHeight = opt.outHeight >> 1;
-    			}
-    			
-    			// Decode photo with scale
-    			opt = new Options();
-    			opt.inSampleSize = scale;
-    			bitmap = BitmapFactory.decodeFile(path, opt);
-    			
-    			// rotate bitmap 90 degrees
-    			Mat mat = new Mat();
-    			Utils.bitmapToMat(bitmap, mat);
-    			Mat matT = mat.t();
-    			Mat matFlip = new Mat(matT.cols(), matT.rows(), CvType.CV_8UC4);
-    			Core.flip(matT, matFlip, 1);
-    			
-    			Bitmap bitmap2 = Bitmap.createBitmap(matT.cols(), matT.rows(), Config.ARGB_8888);
-    			Utils.matToBitmap(matFlip, bitmap2);
-    			mCanvas.setBg(bitmap2);
-    			
-    			// cleanup
-    			mat.release();
-    			matT.release();
-    			matFlip.release();
-    			bitmap.recycle();
+    			setImage(path);
     			
             } else if (resultCode == RESULT_CANCELED) {
             	
@@ -181,6 +153,19 @@ public class CameraActivity extends Activity {
             	finish();
             }
     		break;
+    	
+    	case SELECT_PICTURE:
+    		if (resultCode == RESULT_OK) {
+    			
+	    		Uri selectedImageUri = data.getData();
+	            String strPath = getPath(selectedImageUri);
+	            setImage(strPath);
+    		} else {
+    			
+    			mListener.cancelCameraCallback();
+    			finish();
+    		}
+    		break;
     	}
 	}
 	
@@ -193,11 +178,11 @@ public class CameraActivity extends Activity {
 	 * @param act
 	 * @param mode CameraActivity.RESULT_CODE_NEW_DOC or CameraActivity.RESULT_CODE_ADD_DOC 
 	 */
-	public static void newInstance(Activity act, Listener listener) {
+	public static void newInstance(Activity act, Listener listener, int mode) {
 		
 		Intent i = new Intent(act, CameraActivity.class);
-		sAct = act;
 		sListener = listener;
+		sMode = mode;
 		act.startActivityForResult(i, CameraActivity.REQUEST_CODE);
 	}
 	
@@ -231,6 +216,74 @@ public class CameraActivity extends Activity {
 
 		mListener.newDocCameraCallback(boxList, mCanvas.mBg);
 		finish();
+	}
+	
+	private void setImage(String imagePath) {
+		
+		// calculate optimize scale
+		Display display = getWindowManager().getDefaultDisplay();
+		int w = display.getWidth();
+		int h = display.getHeight();
+		int scale = 1;
+		Options opt = new Options();
+		opt.inJustDecodeBounds = true;
+		Bitmap bitmap = BitmapFactory.decodeFile(imagePath, opt);
+		
+		while (opt.outWidth / 2 > h && opt.outHeight / 2 > w) {
+			scale = scale << 1;
+			opt.outWidth = opt.outWidth >> 1;
+			opt.outHeight = opt.outHeight >> 1;
+		}
+		
+		// Decode photo with scale
+		opt = new Options();
+		opt.inSampleSize = scale;
+		bitmap = BitmapFactory.decodeFile(imagePath, opt);
+
+		if (bitmap.getWidth() > bitmap.getHeight()) {
+
+			// rotate bitmap 90 degrees
+			Mat mat = new Mat();
+			Utils.bitmapToMat(bitmap, mat);
+			Mat matT = mat.t();
+			mat.release();
+			Mat matFlip = new Mat(matT.cols(), matT.rows(), CvType.CV_8UC4);
+			Core.flip(matT, matFlip, 1);
+			matT.release();
+			Bitmap bitmap2 = Bitmap.createBitmap(matFlip.cols(), matFlip.rows(), Config.ARGB_8888);
+			Utils.matToBitmap(matFlip, bitmap2);
+			matFlip.release();
+			bitmap.recycle();
+			bitmap = bitmap2;
+			
+		}
+
+		mCanvas.setBg(bitmap);
+	}
+	
+	private void openGallary() {
+		
+		Intent intent = new Intent();
+		intent.setType("image/*");
+        intent.setAction(Intent.ACTION_PICK);
+        startActivityForResult(intent, SELECT_PICTURE);
+	}
+	
+	private String getPath(Uri uri) {
+		
+		String[] projection = { MediaStore.Images.Media.DATA };
+		
+		Cursor cursor = managedQuery(uri, projection, null, null, null);
+		if(cursor!=null)
+		{
+			//HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
+			//THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
+			int column_index = cursor
+					.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+			cursor.moveToFirst();
+			return cursor.getString(column_index);
+		}
+		else return null;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////

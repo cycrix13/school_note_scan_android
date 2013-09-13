@@ -1,12 +1,10 @@
 package com.hien.schoolnotescan;
 
-import com.hien.schoolnotescan.R;
-
-import android.os.Bundle;
 import android.app.Activity;
-import android.view.Menu;
+import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 
 public class FlashActivity extends Activity {
@@ -30,5 +28,16 @@ public class FlashActivity extends Activity {
 				finish();
 			}
 		});
+	}
+	
+	@Override
+	protected void onDestroy() {
+		
+		if (((CheckBox) findViewById(R.id.btnDontDisplay)).isChecked()) {
+			ConfigHelper.instance().showSplash = false;
+			ConfigHelper.instance().Save();
+		}
+	
+		super.onDestroy();
 	}
 }

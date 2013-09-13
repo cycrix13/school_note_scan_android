@@ -5,37 +5,31 @@ import java.io.IOException;
 import java.util.List;
 import java.util.WeakHashMap;
 
-import org.json.JSONException;
-
-import com.hien.schoolnotescan.CameraActivity.Listener;
-import com.hien.schoolnotescan.LayerManager.BoxState;
-import com.hien.schoolnotescan.R.layout;
-import com.mobeta.android.dslv.DragSortListView;
-import com.mobeta.android.dslv.DragSortListView.DropListener;
-import com.mobeta.android.dslv.DragSortListView.RemoveListener;
-
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
-import android.view.LayoutInflater;
-import android.view.Menu;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.hien.schoolnotescan.CameraActivity.Listener;
+import com.hien.schoolnotescan.LayerManager.BoxState;
+import com.mobeta.android.dslv.DragSortListView;
+import com.mobeta.android.dslv.DragSortListView.DropListener;
+import com.mobeta.android.dslv.DragSortListView.RemoveListener;
 
 public class DetailDocumentActivity extends Activity implements Listener {
 	
@@ -92,7 +86,13 @@ public class DetailDocumentActivity extends Activity implements Listener {
 		setUpListView();
 	}
 	
-
+	@Override
+	public void onBackPressed() {
+	
+		finish();
+		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
+	}
+	
 	@Override
 	public void newDocCameraCallback(List<BoxState> boxList, Bitmap bm) {
 		
@@ -117,13 +117,6 @@ public class DetailDocumentActivity extends Activity implements Listener {
 		act.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
 	}
 	
-	@Override
-	public void onBackPressed() {
-	
-		finish();
-		overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-	}
-	
 	public void onEditClick() {
 		
 		mIsEditing = !mIsEditing;
@@ -133,7 +126,12 @@ public class DetailDocumentActivity extends Activity implements Listener {
 	
 	public void onAddBoxClick() {
 		
-		CameraActivity.newInstance(this, this);
+		CameraActivity.newInstance(this, this, CameraActivity.MODE_CAMERA);
+	}
+	
+	public void onInfoClick() {
+		
+		TagActivity.newInstance(this, mDoc);
 	}
 	
 	public void onExportClick() {
@@ -248,6 +246,17 @@ public class DetailDocumentActivity extends Activity implements Listener {
 			public void onClick(View arg0) {
 
 				onAddBoxClick();
+			}
+		});
+		
+		// Set info button event
+		((ImageButton) findViewById(R.id.btnInfo))
+		.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				onInfoClick();
 			}
 		});
 

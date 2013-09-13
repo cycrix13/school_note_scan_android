@@ -8,5 +8,6 @@
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_detail_document">DetailDocumentActivity</string>
     <string name="title_activity_help_answer">HelpAnswerActivity</string>
+    <string name="title_activity_tag">TagActivity</string>
 
 </resources>

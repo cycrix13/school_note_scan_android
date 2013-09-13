@@ -1,15 +1,11 @@
 package com.hien.schoolnotescan;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.os.Environment;
 import android.util.Log;
 
 import com.itextpdf.text.Document;

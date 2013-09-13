@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -108,7 +111,26 @@ public class DocumentFragment extends RootFragment implements Listener {
 			@Override
 			public void onClick(View v) {
 
-				CameraActivity.newInstance(getActivity(), DocumentFragment.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+				builder.setCancelable(true);
+				builder.setNegativeButton("Camera", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					
+						CameraActivity.newInstance(getActivity(), DocumentFragment.this, CameraActivity.MODE_CAMERA);
+					}
+				});
+				
+				builder.setPositiveButton("Gallery", new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+					
+						CameraActivity.newInstance(getActivity(), DocumentFragment.this, CameraActivity.MODE_FILE);
+					}
+				});
+				builder.create().show();
 			}
 		});
 	}
@@ -135,6 +157,16 @@ public class DocumentFragment extends RootFragment implements Listener {
 	@Override
 	public void cancelCameraCallback() {
 		
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+		super.onActivityResult(requestCode, resultCode, data);
+		
+		switch (requestCode) {
+    	
+    	}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
