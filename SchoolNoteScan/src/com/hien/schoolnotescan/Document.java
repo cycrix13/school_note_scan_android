@@ -24,4 +24,12 @@ public class Document {
 
 		return mName;
 	}
+	
+	public boolean containTag(String tag) {
+		
+		for (String t : mTagList)
+			if (t.equals(tag))
+				return true;
+		return false;
+	}
 }

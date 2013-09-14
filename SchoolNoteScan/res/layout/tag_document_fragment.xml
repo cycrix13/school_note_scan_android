@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dslv="http://schemas.android.com/apk/res/com.hien.schoolnotescan"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF" >
+
+    <com.mobeta.android.dslv.DragSortListView
+        android:id="@+id/lstDoc"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="3dp"
+        android:divider="@drawable/doc_list_divider"
+        android:dividerHeight="1px"
+        android:padding="3dp"
+        dslv:drag_enabled="true"
+        dslv:remove_enabled="true"
+        dslv:remove_mode="clickRemove"
+        dslv:float_alpha="0.6"
+        dslv:click_remove_id="@+id/imgDelete"
+        dslv:drag_handle_id="@+id/imgReorder"
+	    dslv:collapsed_height="2dp"
+	    dslv:drag_scroll_start="0.33"
+	    dslv:max_drag_scroll_speed="0.5"
+	    dslv:slide_shuffle_speed="0.3"/>
+
+</RelativeLayout>

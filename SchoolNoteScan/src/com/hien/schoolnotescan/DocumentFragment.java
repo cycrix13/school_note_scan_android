@@ -6,7 +6,6 @@ import java.util.WeakHashMap;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
@@ -32,9 +31,9 @@ import com.mobeta.android.dslv.DragSortListView.RemoveListener;
 
 public class DocumentFragment extends RootFragment implements Listener {
 	
-	private DragSortListView 		mLstDoc;
-	private DocumentListAdapter 	mAdapter;
-	public DocumentManager			mDocManager;
+	private DragSortListView 	mLstDoc;
+	public  DocumentListAdapter	mAdapter;
+	public  DocumentManager		mDocManager;
 	
 	///////////////////////////////////////////////////////////////////////////
 	// Override method
@@ -53,10 +52,11 @@ public class DocumentFragment extends RootFragment implements Listener {
 		super.onActivityCreated(savedInstanceState);
 		
 		mDocManager = new DocumentManager((MainActivity) getActivity());
+		
 		mLstDoc = (DragSortListView) getView().findViewById(R.id.lstDoc);
 		
 		// Set adapter for list view
-		mAdapter = new DocumentListAdapter();
+		mAdapter = new DocumentListAdapter(mDocManager.mDocList);
 		mLstDoc.setAdapter(mAdapter);
 		
 		// Set document item click event
@@ -65,7 +65,8 @@ public class DocumentFragment extends RootFragment implements Listener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			
-				DetailDocumentActivity.newInstance(mAdapter.getItem(position), mDocManager, (MainActivity) getActivity());
+				DetailDocumentActivity.newInstance(mAdapter.getItem(position),
+						mDocManager, (MainActivity) getActivity());
 			}
 		});
 
@@ -160,20 +161,6 @@ public class DocumentFragment extends RootFragment implements Listener {
 	}
 	
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-		super.onActivityResult(requestCode, resultCode, data);
-		
-		switch (requestCode) {
-    	
-    	}
-	}
-	
-	///////////////////////////////////////////////////////////////////////////
-	// Public method
-	///////////////////////////////////////////////////////////////////////////
-	
-	@Override
 	public void toggleEdit() {
 		
 		mIsEditing = !mIsEditing;
@@ -182,6 +169,10 @@ public class DocumentFragment extends RootFragment implements Listener {
 		((MainActivity) getActivity()).updateEditButtonState();
 	}
 	
+	///////////////////////////////////////////////////////////////////////////
+	// Public method
+	///////////////////////////////////////////////////////////////////////////
+
 	public void addNewDoc(List<BoxState> boxList, Bitmap bm) {
 
 		Document doc = new Document();
@@ -262,8 +253,8 @@ public class DocumentFragment extends RootFragment implements Listener {
 		
 		private WeakHashMap<String, Bitmap> mBitmapCache;
 		
-		public DocumentListAdapter() {
-			super(DocumentFragment.this.getActivity(), R.layout.document_item, R.id.txtName, mDocManager.mDocList);
+		public DocumentListAdapter(List<Document> docList) {
+			super(DocumentFragment.this.getActivity(), R.layout.document_item, R.id.txtName, docList);
 			mBitmapCache = new WeakHashMap<String, Bitmap>();
 		}
 		

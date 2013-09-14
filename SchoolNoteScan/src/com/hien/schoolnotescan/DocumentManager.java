@@ -161,10 +161,39 @@ public class DocumentManager {
 		
 	}
 	
-	
 	public List<String> getTagList() {
 		
-		return null;
+		List<String> tagList = new ArrayList<String>();
+
+		for (Document doc : mDocList)	
+			for (String tag : doc.mTagList)
+				addIfNotExist(tag, tagList);
+		
+		return tagList;
+	}
+	
+	public static void addIfNotExist(String tag, List<String> tagList) {
+		
+		boolean exist = false;
+		for (String t : tagList)
+			if (tag.equalsIgnoreCase(t)) {
+				exist = true;
+				break;
+			}
+		
+		if (!exist)
+			tagList.add(tag);
+	}
+	
+	public List<Document> getDocByTag(String tag) {
+		
+		List<Document> docList = new ArrayList<Document>();
+		
+		for (Document doc : mDocList)
+			if (doc.containTag(tag))
+				docList.add(doc);
+		
+		return docList;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////
@@ -194,5 +223,13 @@ public class DocumentManager {
 				return doc;
 		
 		return null;
+	}
+	
+	///////////////////////////////////////////////////////////////////////////
+	// Listener
+	///////////////////////////////////////////////////////////////////////////
+	
+	public class Listener {
+		public void documentChangeListener() {}
 	}
 }

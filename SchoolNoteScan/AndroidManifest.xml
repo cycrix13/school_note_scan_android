@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"
@@ -59,6 +60,41 @@
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Black.NoTitleBar" >
         </activity>
+        <activity
+            android:name="com.hien.schoolnotescan.AddTagActivity"
+            android:label="@string/title_activity_add_tag"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysVisible" >
+        </activity>
+        <activity
+            android:name="com.hien.schoolnotescan.NameDocumentActivity"
+            android:label="@string/title_activity_name_document"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.hien.schoolnotescan.TutorialActivity"
+            android:label="@string/title_activity_tutorial"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Black.NoTitleBar" >
+        </activity>
+        <activity
+            android:name="com.dropbox.client2.android.AuthActivity"
+            android:configChanges="orientation|keyboard"
+            android:launchMode="singleTask" >
+            <intent-filter>
+
+                <!-- Change this to be db- followed by your app key -->
+                <data android:scheme="db-eiqo4tec8eiygci" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

@@ -9,5 +9,8 @@
     <string name="title_activity_detail_document">DetailDocumentActivity</string>
     <string name="title_activity_help_answer">HelpAnswerActivity</string>
     <string name="title_activity_tag">TagActivity</string>
+    <string name="title_activity_add_tag">AddTagActivity</string>
+    <string name="title_activity_name_document">NameDocumentActivity</string>
+    <string name="title_activity_tutorial">TutorialActivity</string>
 
 </resources>

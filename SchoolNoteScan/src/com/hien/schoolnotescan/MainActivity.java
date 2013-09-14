@@ -6,9 +6,12 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +27,7 @@ import android.widget.TextView;
 import com.hien.schoolnotescan.CameraActivity.Listener;
 import com.hien.schoolnotescan.LayerManager.BoxState;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenListener;
 
 public class MainActivity extends FragmentActivity implements Listener {
 	
@@ -53,8 +57,9 @@ public class MainActivity extends FragmentActivity implements Listener {
     
     private ExpandableListView 	expListView;
     private SlidingMenu 		mSideMenu;
+    private ExpandableListAdapter mSideMenuAdapter;
     
-    private RootFragment[] 			mFragmentArr = new RootFragment[7];
+    private RootFragment[] 			mFragmentArr = new RootFragment[8];
     private DocumentFragment		mDocFrag;
     private TutorialFragment 		mTutorFrag;
     private WifiSharingFragment 	mWifiFrag;
@@ -62,6 +67,7 @@ public class MainActivity extends FragmentActivity implements Listener {
     private HelpFragment 			mHelpFrag;
     private RestorePurchaseFragment mRestoreFrag;
     private UnlockPremiumFragment 	mUnlockFrag;
+    private TagDocumentFragment 	mTagFrag;
     private RootFragment			mActiveFrag;
     
     ///////////////////////////////////////////////////////////////////////////
@@ -84,6 +90,7 @@ public class MainActivity extends FragmentActivity implements Listener {
         	// Start flash screen
         	Intent intent = new Intent(this, FlashActivity.class);
         	startActivityForResult(intent, FlashActivity.REQUEST_CODE);
+        	Log.d("CycrixDebug", "FlashActivity start");
         }
         
         // Create side menu
@@ -96,6 +103,23 @@ public class MainActivity extends FragmentActivity implements Listener {
         mSideMenu.setFadeDegree(0.35f);
         mSideMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
         mSideMenu.setMenu(R.layout.side_menu);
+        mSideMenu.setOnOpenListener(new OnOpenListener() {
+			
+			@Override
+			public void onOpen() {
+
+				mSideMenuAdapter.SetTagList(mDocFrag.mDocManager.getTagList());
+			}
+		});
+        
+        // Set adapter for side menu
+        expListView = (ExpandableListView) findViewById(R.id.lstMenu);
+        mSideMenuAdapter = new ExpandableListAdapter(this, expListView); 
+        expListView.setAdapter(mSideMenuAdapter);
+        
+        // Expand all menus
+        for (int i = 0; i < mSideMenuAdapter.getGroupCount(); i++)
+        	expListView.expandGroup(i);
 	
 		// Set menu button
 		((ImageButton) findViewById(R.id.btnMenu))
@@ -119,15 +143,6 @@ public class MainActivity extends FragmentActivity implements Listener {
 			}
 		});
         
-        // Set adapter for side menu
-        expListView = (ExpandableListView) findViewById(R.id.lstMenu);
-        ExpandableListAdapter adapter = new ExpandableListAdapter(this, expListView); 
-        expListView.setAdapter(adapter);
-        
-        // Expand all menu
-        for (int i = 0; i < adapter.getGroupCount(); i++)
-        	expListView.expandGroup(i);
-        
         // Create fragment list
         FragmentManager manager = getSupportFragmentManager();
         mFragmentArr[0] = mDocFrag 		= (DocumentFragment) 		manager.findFragmentById(R.id.fragDocument);
@@ -137,6 +152,7 @@ public class MainActivity extends FragmentActivity implements Listener {
         mFragmentArr[4] = mHelpFrag 	= (HelpFragment) 			manager.findFragmentById(R.id.fragHelp);
         mFragmentArr[5] = mRestoreFrag 	= (RestorePurchaseFragment) manager.findFragmentById(R.id.fragRestore);
         mFragmentArr[6] = mUnlockFrag 	= (UnlockPremiumFragment) 	manager.findFragmentById(R.id.fragUnlock);
+        mFragmentArr[7] = mTagFrag 		= (TagDocumentFragment) 	manager.findFragmentById(R.id.fragTag);
         
         // Hide other fragments
         mActiveFrag = mDocFrag;
@@ -160,9 +176,29 @@ public class MainActivity extends FragmentActivity implements Listener {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     
     	super.onActivityResult(requestCode, resultCode, data);
+    	if (resultCode != Activity.RESULT_OK)
+    		return;
     	
     	switch (requestCode) {
-    	
+    	case FlashActivity.REQUEST_CODE:
+    		Log.d("CycrixDebug", "FlashActivity.REQUEST_CODE recived");
+    		if (ConfigHelper.instance().firstTime) {
+    			
+//    			TutorialActivity.newInstance(this, new TutorialActivity.Listener() {
+//    				
+//    				@Override
+//    				public void onHelpClick() {
+//    				
+//    					MainActivity.this.onHelpClick();
+//    				}
+//    			});
+//    			Log.d("CycrixDebug", "TutorialActivity.newInstance");
+    			
+    			ConfigHelper.instance().firstTime = false;
+    			ConfigHelper.instance().Save();
+    		}
+    			
+    		break;
     	}
     }
     
@@ -218,8 +254,10 @@ public class MainActivity extends FragmentActivity implements Listener {
     		txtTitle.setText("Restore purchase");
     	} else if (mActiveFrag == mUnlockFrag) {
     		txtTitle.setText("Unlock Premium");
+    	} else if (mActiveFrag == mTagFrag) {
+    		txtTitle.setText("Documents");
     	}
-    }	
+    }
 
 	///////////////////////////////////////////////////////////////////////////
 	// side menu event handler
@@ -232,6 +270,7 @@ public class MainActivity extends FragmentActivity implements Listener {
     	
     	mSideMenu.toggle();
     	updateEditButtonState();
+    	mDocFrag.mAdapter.notifyDataSetChanged();
     }
     
     public void onTutorialClick() {
@@ -266,7 +305,8 @@ public class MainActivity extends FragmentActivity implements Listener {
     	getSupportFragmentManager().beginTransaction().hide(mActiveFrag).show(mHelpFrag).commit();
     	mActiveFrag = mHelpFrag;
     	
-    	mSideMenu.toggle();
+    	if (mSideMenu.isMenuShowing())
+    		mSideMenu.toggle();
     	updateEditButtonState();
     }
     
@@ -288,9 +328,14 @@ public class MainActivity extends FragmentActivity implements Listener {
     	updateEditButtonState();
     }
     
-    public void onTagsClick(int index) {
+    public void onTagsClick(int index, String tag) {
+    	
+    	mTagFrag.setTag(mDocFrag.mDocManager, tag);
+    	getSupportFragmentManager().beginTransaction().hide(mActiveFrag).show(mTagFrag).commit();
+    	mActiveFrag = mTagFrag;
     	
     	mSideMenu.toggle();
+    	updateEditButtonState();
     }
     
     ///////////////////////////////////////////////////////////////////////////

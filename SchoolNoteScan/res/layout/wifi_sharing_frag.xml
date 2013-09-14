@@ -23,7 +23,8 @@
                 android:text="Wifi Sharing"
                 android:textColor="#000000"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                 />
 
             <ToggleButton
                 android:id="@+id/btnWifi"

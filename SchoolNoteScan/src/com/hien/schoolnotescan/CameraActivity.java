@@ -240,7 +240,7 @@ public class CameraActivity extends Activity {
 		opt.inSampleSize = scale;
 		bitmap = BitmapFactory.decodeFile(imagePath, opt);
 
-		if (bitmap.getWidth() > bitmap.getHeight()) {
+		if (mMode == MODE_CAMERA && bitmap.getWidth() > bitmap.getHeight()) {
 
 			// rotate bitmap 90 degrees
 			Mat mat = new Mat();
@@ -255,7 +255,6 @@ public class CameraActivity extends Activity {
 			matFlip.release();
 			bitmap.recycle();
 			bitmap = bitmap2;
-			
 		}
 
 		mCanvas.setBg(bitmap);

@@ -18,8 +18,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
  
     private MainActivity mContext;
     private Map<String, List<String>> menuCollections = new LinkedHashMap<String, List<String>>();
-    private List<String> groupMenuList = new ArrayList<String>();;
+    private List<String> groupMenuList = new ArrayList<String>();
  
+    ///////////////////////////////////////////////////////////////////////////
+    // Public methods
+    ///////////////////////////////////////////////////////////////////////////
+    
     public ExpandableListAdapter(MainActivity context, ExpandableListView explst) {
     	
         mContext = context;
@@ -47,6 +51,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
 					}
 					break;
 				case 1:
+					mContext.onTagsClick(childPosition, (String) getChild(1, childPosition));
 					break;
 				case 2:
 					switch (childPosition) {
@@ -94,6 +99,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     private void addChildMenu(String menu) {
     	
     	menuCollections.get(groupMenuList.get(groupMenuList.size() - 1)).add(menu);
+    }
+    
+    public void SetTagList(List<String> tagList) {
+    	
+    	List<String> menuTagList = menuCollections.get(groupMenuList.get(1));
+    	menuTagList.clear();
+    	menuTagList.addAll(tagList);
+    	notifyDataSetChanged();
     }
  
     public Object getChild(int groupPosition, int childPosition) {

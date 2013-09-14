@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dslv="http://schemas.android.com/apk/res/com.hien.schoolnotescan"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    tools:context=".MainActivity" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout3"
+        android:scaleType="fitXY"
+        android:src="@drawable/tutorial_page" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/footer"
+        android:padding="8dp" >
+
+        <Button
+            android:id="@+id/btnGotIt"
+            android:layout_width="48dp"
+            android:layout_height="32dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_iphone_default"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="Got it!"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnHelp"
+            android:layout_width="48dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_iphone_default"
+            android:shadowColor="#000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="Help"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+</RelativeLayout>

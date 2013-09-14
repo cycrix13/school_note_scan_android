@@ -19,8 +19,8 @@
             android:layout_height="32dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/button_iphone_default"
-            android:text="Edit"
+            android:background="@drawable/button_iphone_highlight"
+            android:text="Done"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:shadowColor="#000000"
@@ -34,14 +34,14 @@
             android:layout_height="32dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:background="@drawable/button_iphone_highlight"
-            android:text="Done"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
+            android:background="@drawable/button_iphone_default"
             android:shadowColor="#000000"
             android:shadowDx="1"
             android:shadowDy="1"
-            android:shadowRadius="2" />
+            android:shadowRadius="2"
+            android:text="Back"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtTitle"
@@ -61,7 +61,6 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#FFFFFF"
             android:textStyle="bold" />
-
     </RelativeLayout>
 
     <RelativeLayout
@@ -71,75 +70,29 @@
         android:layout_below="@+id/RelativeLayout1"
         android:padding="20dp" >
 
-        <RelativeLayout
-            android:id="@+id/relativeLayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" >
-
-            <Button
-                android:id="@+id/btnAddTag"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/about_box"
-                android:gravity="left"
-                android:text="Add tag"
-                android:textColor="#000000"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="8dp"
-                android:src="@drawable/arrow" />
-        </RelativeLayout>
-
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/relativeLayout2"
-            android:layout_below="@+id/relativeLayout2"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:text="My Tags"
-            android:textColor="#4C566C"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:text="Tags"
+            android:textColor="#000000"
             android:textStyle="bold" />
-        
-        <RelativeLayout
+
+        <EditText
+            android:id="@+id/edtTag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/textView1" >
+            android:layout_alignLeft="@+id/textView1"
+            android:layout_below="@+id/textView1"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/about_box"
+            android:ems="10"
+            android:hint="eg. expenses, recipes..." >
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/about_box"
-                android:orientation="vertical" >
-
-            </LinearLayout>
-
-            <com.mobeta.android.dslv.DragSortListView
-                android:id="@+id/lst"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:divider="@drawable/doc_list_divider"
-                android:dividerHeight="1px"
-                android:padding="3dp"
-                dslv:click_remove_id="@+id/imgDelete"
-                dslv:drag_handle_id="@+id/imageView2"
-                dslv:collapsed_height="2dp"
-                dslv:drag_scroll_start="0.33"
-                dslv:float_alpha="0.6"
-                dslv:max_drag_scroll_speed="0.5"
-                dslv:remove_enabled="true"
-                dslv:drag_enabled="true"
-                dslv:remove_mode="clickRemove"
-                dslv:slide_shuffle_speed="0.3" />
-
-        </RelativeLayout>
-
+            <requestFocus />
+        </EditText>
     </RelativeLayout>
 
 </RelativeLayout>
