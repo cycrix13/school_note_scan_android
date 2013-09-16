@@ -89,7 +89,9 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/about_box"
             android:ems="10"
-            android:hint="eg. expenses, recipes..." >
+            android:hint="eg. expenses, recipes..."
+            android:imeOptions="actionDone"
+            android:singleLine="true" >
 
             <requestFocus />
         </EditText>

@@ -129,6 +129,27 @@ public class CameraActivity extends Activity {
 	}
 	
 	@Override
+	protected void onResume() {
+	
+		super.onResume();
+		Log.d("CycrixDebug", "CameraActivity resume");
+	}
+	
+	@Override
+	protected void onPause() {
+	
+		super.onPause();
+		Log.d("CycrixDebug", "CameraActivity pause");
+	}
+	
+	@Override
+	protected void onDestroy() {
+	
+		super.onDestroy();
+		Log.d("CycrixDebug", "CameraActivity destroy");
+	}
+	
+	@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     
     	super.onActivityResult(requestCode, resultCode, data);

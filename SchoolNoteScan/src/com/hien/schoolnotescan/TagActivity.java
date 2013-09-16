@@ -8,11 +8,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.hien.schoolnotescan.AddTagActivity.Listener;
+import com.hien.schoolnotescan.Document.Tag;
 import com.mobeta.android.dslv.DragSortListView;
 import com.mobeta.android.dslv.DragSortListView.RemoveListener;
 
@@ -25,7 +29,7 @@ public class TagActivity extends Activity {
 	// Data
 	private Document 		mDoc;
 	private DocumentManager mDocManager;
-	private List<String> 	mTagList;
+	private List<Tag> 		mTagList;
 	private TagListAdapter 	mAdapter;
 	private boolean			mIsEditing;
 	
@@ -50,11 +54,21 @@ public class TagActivity extends Activity {
 		sDoc 		= null;
 		sDocManager = null;
 		
-		// Set up listview
+		// Set up list view
 		mLst = (DragSortListView) findViewById(R.id.lst);
 		mTagList = mDoc.mTagList;
 		mAdapter = new TagListAdapter();
 		mLst.setAdapter(mAdapter);
+		
+		// Set list view item click event
+		mLst.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				
+				TagActivity.this.onItemClick(position);
+			}
+		});
 		
 		// Set delete event
 		mLst.setRemoveListener(new RemoveListener() {
@@ -110,7 +124,7 @@ public class TagActivity extends Activity {
 						tagName = tagName.trim();
 						if (tagName.length() == 0)
 							return;
-						DocumentManager.addIfNotExist(tagName, mTagList);
+						DocumentManager.addIfNotExist(tagName, mTagList, 0);
 						try {
 							mDocManager.save(TagActivity.this);
 						} catch (Exception e) {
@@ -133,9 +147,10 @@ public class TagActivity extends Activity {
 	// Public methods
 	///////////////////////////////////////////////////////////////////////////
 	
-	public static void newInstance(Activity act, Document doc) {
+	public static void newInstance(Activity act, Document doc, DocumentManager docManager) {
 		
 		sDoc = doc;
+		sDocManager = docManager;
 		Intent intent = new Intent(act, TagActivity.class);
 		act.startActivity(intent);
 		act.overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
@@ -156,11 +171,17 @@ public class TagActivity extends Activity {
 		mAdapter.notifyDataSetChanged();
 	}
 	
+	public void onItemClick(int pos) {
+		
+		mTagList.get(pos).enable = !mTagList.get(pos).enable;
+		mAdapter.notifyDataSetChanged();
+	}
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Adapter
 	///////////////////////////////////////////////////////////////////////////
 	
-	private class TagListAdapter extends ArrayAdapter<String> {
+	private class TagListAdapter extends ArrayAdapter<Tag> {
 
 		public TagListAdapter() {
 			
@@ -172,9 +193,15 @@ public class TagActivity extends Activity {
 
 			View v = super.getView(position, convertView, parent);
 
+			Tag tag = getItem(position);
+			((TextView) v.findViewById(R.id.txtName)).setText(tag.tag);
+			
 			// Set visibility
 			((ImageView) v.findViewById(R.id.imgDelete)).setVisibility(
 					mIsEditing ? View.VISIBLE : View.GONE);
+			
+			((ImageView) v.findViewById(R.id.imgTick)).setVisibility(
+					tag.enable ? View.VISIBLE : View.GONE);
 
 			return v;
 		}

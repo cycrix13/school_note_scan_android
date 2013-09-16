@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hien.schoolnotescan.Document.Tag;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -101,11 +103,12 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     	menuCollections.get(groupMenuList.get(groupMenuList.size() - 1)).add(menu);
     }
     
-    public void SetTagList(List<String> tagList) {
+    public void SetTagList(List<Tag> tagList) {
     	
     	List<String> menuTagList = menuCollections.get(groupMenuList.get(1));
     	menuTagList.clear();
-    	menuTagList.addAll(tagList);
+    	for (Tag t : tagList)
+    		menuTagList.add(t.tag);
     	notifyDataSetChanged();
     }
  

@@ -6,17 +6,24 @@ import java.util.List;
 
 public class Document {
 	
+	public static class Tag {
+		
+		public Tag(String tag) {
+			this.tag = tag;
+		}
+		
+		public String tag;
+		public boolean enable = true;
+	}
+	
 	public String 		mPreviewPath;
 	public String 		mName;
-	public Date 		mDate 			= new Date();
-	public List<String> mNotePathArr 	= new ArrayList<String>();
-	public List<String> mTagList 		= new ArrayList<String>();
+	public Date 		mDate 		= new Date();
+	public List<String> mNotePathArr= new ArrayList<String>();
+	public List<Tag> 	mTagList	= new ArrayList<Tag>();
 	
 	public Document() {
-		
-		mTagList.add("Tag 1");
-		mTagList.add("Tag 2");
-		mTagList.add("Tag 3");
+
 	}
 	
 	@Override
@@ -27,8 +34,8 @@ public class Document {
 	
 	public boolean containTag(String tag) {
 		
-		for (String t : mTagList)
-			if (t.equals(tag))
+		for (Tag t : mTagList)
+			if (t.enable && t.tag.equals(tag))
 				return true;
 		return false;
 	}

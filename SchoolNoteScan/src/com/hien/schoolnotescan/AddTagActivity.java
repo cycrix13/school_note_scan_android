@@ -3,11 +3,14 @@ package com.hien.schoolnotescan;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 public class AddTagActivity extends Activity {
 	
@@ -47,6 +50,16 @@ public class AddTagActivity extends Activity {
 			public void onClick(View arg0) {
 				
 				onBackPressed();
+			}
+		});
+		
+		((EditText) findViewById(R.id.edtTag)).setOnEditorActionListener(new OnEditorActionListener() {
+			
+			@Override
+			public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
+
+				onEditClick();
+				return false;
 			}
 		});
 	}

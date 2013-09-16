@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.hien.schoolnotescan.Document.Tag;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -95,6 +97,14 @@ public class DocumentManager {
 			jDoc.put("notePathArr", jNotepathArr);
 			for (String path : doc.mNotePathArr)
 				jNotepathArr.put(path);
+			JSONArray jTagArr = new JSONArray();
+			jDoc.put("tagArr", jTagArr);
+			for (Tag tag : doc.mTagList) {
+				JSONObject jTag = new JSONObject();
+				jTagArr.put(jTag);
+				jTag.put("tag", tag.tag);
+				jTag.put("enable", tag.enable);
+			}
 		}
 		
 		// Write to file
@@ -142,7 +152,14 @@ public class DocumentManager {
 			doc.mNotePathArr.clear();
 			for (int j = 0; j < jBoxArr.length(); j++)
 				doc.mNotePathArr.add(jBoxArr.getString(j));
-			
+			JSONArray jTagArr = jDoc.getJSONArray("tagArr");
+			doc.mTagList.clear();
+			for (int j = 0; j < jTagArr.length(); j++) {
+				JSONObject jTag = jTagArr.getJSONObject(j);
+				Tag tag = new Tag(jTag.getString("tag"));
+				tag.enable = jTag.getBoolean("enable");
+				doc.mTagList.add(tag);
+			}
 			mDocList.add(doc);
 		}
 	}
@@ -161,13 +178,14 @@ public class DocumentManager {
 		
 	}
 	
-	public List<String> getTagList() {
+	public List<Tag> getTagList() {
 		
-		List<String> tagList = new ArrayList<String>();
+		List<Tag> tagList = new ArrayList<Tag>();
 
 		for (Document doc : mDocList)	
-			for (String tag : doc.mTagList)
-				addIfNotExist(tag, tagList);
+			for (Tag tag : doc.mTagList)
+				if (tag.enable)
+					addIfNotExist(tag.tag, tagList, 0);
 		
 		return tagList;
 	}
@@ -183,6 +201,19 @@ public class DocumentManager {
 		
 		if (!exist)
 			tagList.add(tag);
+	}
+	
+	public static void addIfNotExist(String tag, List<Tag> tagList, int dummy) {
+		
+		boolean exist = false;
+		for (Tag t : tagList)
+			if (tag.equalsIgnoreCase(t.tag)) {
+				exist = true;
+				break;
+			}
+		
+		if (!exist)
+			tagList.add(new Tag(tag));
 	}
 	
 	public List<Document> getDocByTag(String tag) {

@@ -24,10 +24,16 @@ public class FlashActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				
-				setResult(RESULT_CODE_RETAKE);
-				finish();
+				onBackPressed();
 			}
 		});
+	}
+	
+	@Override
+	public void onBackPressed() {
+	
+		setResult(RESULT_OK);
+		finish();
 	}
 	
 	@Override

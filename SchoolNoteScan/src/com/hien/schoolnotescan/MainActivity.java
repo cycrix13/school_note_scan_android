@@ -2,16 +2,13 @@ package com.hien.schoolnotescan;
 
 import java.util.List;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -33,25 +30,25 @@ public class MainActivity extends FragmentActivity implements Listener {
 	
 	private static final String  TAG = "MainActivity";
 	
-	private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
-    	@Override
-    	public void onManagerConnected(int status) {
-    		switch (status) {
-    		case LoaderCallbackInterface.SUCCESS:
-    		{
-    			Log.i(TAG, "OpenCV loaded successfully");
-    			
-    			System.loadLibrary("SchoolNoteScan"); 
-    			mCore = new CppCore();
-
-    		} break;
-    		default:
-    		{
-    			super.onManagerConnected(status);
-    		} break;
-    		}
-    	}
-    };
+//	private BaseLoaderCallback  mLoaderCallback = new BaseLoaderCallback(this) {
+//    	@Override
+//    	public void onManagerConnected(int status) {
+//    		switch (status) {
+//    		case LoaderCallbackInterface.SUCCESS:
+//    		{
+//    			Log.i(TAG, "OpenCV loaded successfully");
+//    			
+//    			System.loadLibrary("SchoolNoteScan"); 
+//    			mCore = new CppCore();
+//
+//    		} break;
+//    		default:
+//    		{
+//    			super.onManagerConnected(status);
+//    		} break;
+//    		}
+//    	}
+//    };
     
 	public static CppCore mCore;
     
@@ -80,7 +77,10 @@ public class MainActivity extends FragmentActivity implements Listener {
         setContentView(R.layout.activity_main);
         
         // Init OpenCV
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
+//        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
+        Mat mat = new Mat(10, 10, CvType.CV_32SC4);
+        System.loadLibrary("SchoolNoteScan"); 
+		mCore = new CppCore();
         
         // Load config
         ConfigHelper.InitInstance(this);
@@ -184,15 +184,15 @@ public class MainActivity extends FragmentActivity implements Listener {
     		Log.d("CycrixDebug", "FlashActivity.REQUEST_CODE recived");
     		if (ConfigHelper.instance().firstTime) {
     			
-//    			TutorialActivity.newInstance(this, new TutorialActivity.Listener() {
-//    				
-//    				@Override
-//    				public void onHelpClick() {
-//    				
+    			TutorialActivity.newInstance(this, new TutorialActivity.Listener() {
+    				
+    				@Override
+    				public void onHelpClick() {
+    				
 //    					MainActivity.this.onHelpClick();
-//    				}
-//    			});
-//    			Log.d("CycrixDebug", "TutorialActivity.newInstance");
+    				}
+    			});
+    			Log.d("CycrixDebug", "TutorialActivity.newInstance");
     			
     			ConfigHelper.instance().firstTime = false;
     			ConfigHelper.instance().Save();

@@ -231,7 +231,7 @@ public class DetailDocumentActivity extends Activity implements Listener {
 	
 	public void onEditTagClick() {
 		
-		TagActivity.newInstance(this, mDoc);
+		TagActivity.newInstance(this, mDoc, mDocManager);
 	}
 	
 	public void onExportClick() {
@@ -348,9 +348,11 @@ public class DetailDocumentActivity extends Activity implements Listener {
 			builder.append("No tag");
 		else
 			for (int i = 0; i < mDoc.mTagList.size(); i++) {
-				builder.append(mDoc.mTagList.get(i));
-				if (i < mDoc.mTagList.size() - 1)
-					builder.append(", ");
+				if (mDoc.mTagList.get(i).enable) {
+					if (builder.length() != 0)
+						builder.append(", ");
+					builder.append(mDoc.mTagList.get(i).tag);
+				}
 			}
 			
 		txtTag.setText(builder.toString());
